@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS2 Tournament Overlay</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: transparent;
+            overflow: hidden;
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+        }
+        
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        /* Main Scoreboard */
+        .scoreboard {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(0, 15, 25, 0.95), rgba(10, 25, 35, 0.95));
+            border: 2px solid #00d4ff;
+            border-radius: 15px;
+            padding: 15px 25px;
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3);
+            backdrop-filter: blur(10px);
+            animation: slideDown 1s ease-out;
+        }
+        
+        .team {
+            display: flex;
+            align-items: center;
+            min-width: 200px;
+        }
+        
+        .team-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: white;
+            margin-right: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .team-info {
+            flex: 1;
+        }
+        
+        .team-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .team-country {
+            font-size: 14px;
+            color: #00d4ff;
+            font-weight: 400;
+        }
+        
+        .score-section {
+            margin: 0 30px;
+            text-align: center;
+        }
+        
+        .score {
+            font-size: 48px;
+            font-weight: 700;
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            margin: 0 20px;
+        }
+        
+        .vs {
+            font-size: 18px;
+            color: #ffffff;
+            font-weight: 600;
+            margin: 0 10px;
+        }
+        
+        .match-info {
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        .round-info {
+            font-size: 16px;
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        
+        .map-name {
+            font-size: 14px;
+            color: #ffffff;
+            margin-top: 2px;
+        }
+        
+        /* Side Panels */
+        .side-panel {
+            position: absolute;
+            top: 150px;
+            width: 280px;
+            background: linear-gradient(135deg, rgba(0, 15, 25, 0.9), rgba(10, 25, 35, 0.9));
+            border: 1px solid #00d4ff;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .side-panel.left {
+            left: 30px;
+            animation: slideInLeft 1s ease-out 0.5s both;
+        }
+        
+        .side-panel.right {
+            right: 30px;
+            animation: slideInRight 1s ease-out 0.5s both;
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00d4ff;
+            text-align: center;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .player-list {
+            list-style: none;
+        }
+        
+        .player {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            color: #ffffff;
+        }
+        
+        .player:last-child {
+            border-bottom: none;
+        }
+        
+        .player-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .player-stats {
+            font-size: 14px;
+            color: #00ff88;
+        }
+        
+        /* Timer */
+        .timer {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(247, 147, 30, 0.9));
+            border: 2px solid #ff6b35;
+            border-radius: 10px;
+            padding: 10px 20px;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+            animation: slideInRight 1s ease-out 0.3s both;
+        }
+        
+        /* Bottom Info Bar */
+        .info-bar {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(0, 15, 25, 0.95), rgba(10, 25, 35, 0.95));
+            border: 1px solid #00d4ff;
+            border-radius: 25px;
+            padding: 10px 30px;
+            backdrop-filter: blur(10px);
+            animation: slideUp 1s ease-out 0.7s both;
+        }
+        
+        .tournament-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+        }
+        
+        .tournament-stage {
+            font-size: 14px;
+            color: #00d4ff;
+            text-align: center;
+            margin-top: 2px;
+        }
+        
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Glow effects */
+        .scoreboard::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00d4ff, #00ff88, #ff6b35, #00d4ff);
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0.3;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            0% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0.7;
+            }
+        }
+        
+        /* Responsive adjustments for different stream resolutions */
+        @media (max-width: 1280px) {
+            .scoreboard {
+                transform: translateX(-50%) scale(0.8);
+            }
+            .side-panel {
+                transform: scale(0.8);
+            }
+            .timer {
+                transform: scale(0.8);
+            }
+            .info-bar {
+                transform: translateX(-50%) scale(0.8);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay-container">
+        <!-- Main Scoreboard -->
+        <div class="scoreboard">
+            <div class="team">
+                <div class="team-logo" id="team1-logo">T1</div>
+                <div class="team-info">
+                    <div class="team-name" id="team1-name">TEAM ALPHA</div>
+                    <div class="team-country" id="team1-country">🇺🇸 USA</div>
+                </div>
+            </div>
+            
+            <div class="score-section">
+                <div style="display: flex; align-items: center;">
+                    <span class="score" id="team1-score">12</span>
+                    <span class="vs">VS</span>
+                    <span class="score" id="team2-score">8</span>
+                </div>
+                <div class="match-info">
+                    <div class="round-info" id="round-info">ROUND 21/30</div>
+                    <div class="map-name" id="map-name">DE_MIRAGE</div>
+                </div>
+            </div>
+            
+            <div class="team">
+                <div class="team-info" style="text-align: right;">
+                    <div class="team-name" id="team2-name">TEAM BETA</div>
+                    <div class="team-country" id="team2-country">🇧🇷 BRAZIL</div>
+                </div>
+                <div class="team-logo" id="team2-logo">T2</div>
+            </div>
+        </div>
+        
+        <!-- Timer -->
+        <div class="timer" id="timer">1:45</div>
+        
+        <!-- Left Team Panel -->
+        <div class="side-panel left">
+            <div class="panel-title" id="left-panel-title">TEAM ALPHA</div>
+            <ul class="player-list">
+                <li class="player">
+                    <span class="player-name">player1</span>
+                    <span class="player-stats">18-5</span>
+                </li>
+                <li class="player">
+                    <span class="player-name">player2</span>
+                    <span class="player-stats">15-8</span>
+                </li>
+                <li class="player">
+                    <span class="player-name">player3</span>
+                    <span class="player-stats">12-10</span>
+                </li>
+                <li class="player">
+                    <span class="player-name">player4</span>
+                    <span class="player-stats">9-12</span>
+                </li>
+                <li class="player">
+                    <span class="player-name">player5</span>
+                    <span class="player-stats">8-15</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Right Team Panel -->
+        <div class="side-panel right">
+            <div class="panel-title" id="right-panel-title">TEAM BETA</div>
+            <ul class="player-list">
+                <li class="player">
+                    <span class="player-name">player6</span>
+                    <span class="player-stats">16-7</span>
+                </li>
+                <li class="player">
+                    <span class="player-name">player7</span>
+                    <span class="player-stats">14-9</span>
+                </li>
+                <li class="player">
+                    <span class="player-name">player8</span>
+                    <span class="player-stats">11-11</span>
+                </li>
+                <li class="player">
+                    <span class="player-name">player9</span>
+                    <span class="player-stats">10-13</span>
+                </li>
+                <li class="player">
+                    <span class="player-name">player10</span>
+                    <span class="player-stats">7-16</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Tournament Info -->
+        <div class="info-bar">
+            <div class="tournament-name" id="tournament-name">CS2 CHAMPIONSHIP 2025</div>
+            <div class="tournament-stage" id="tournament-stage">GRAND FINAL - BO3</div>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to update scoreboard data
+        const overlayData = {
+            team1: {
+                name: "TEAM ALPHA",
+                logo: "T1",
+                country: "🇺🇸 USA",
+                score: 12,
+                players: [
+                    {name: "player1", stats: "18-5"},
+                    {name: "player2", stats: "15-8"},
+                    {name: "player3", stats: "12-10"},
+                    {name: "player4", stats: "9-12"},
+                    {name: "player5", stats: "8-15"}
+                ]
+            },
+            team2: {
+                name: "TEAM BETA",
+                logo: "T2",
+                country: "🇧🇷 BRAZIL",
+                score: 8,
+                players: [
+                    {name: "player6", stats: "16-7"},
+                    {name: "player7", stats: "14-9"},
+                    {name: "player8", stats: "11-11"},
+                    {name: "player9", stats: "10-13"},
+                    {name: "player10", stats: "7-16"}
+                ]
+            },
+            match: {
+                round: "ROUND 21/30",
+                map: "DE_MIRAGE",
+                timer: "1:45"
+            },
+            tournament: {
+                name: "CS2 CHAMPIONSHIP 2025",
+                stage: "GRAND FINAL - BO3"
+            }
+        };
+
+        function updateOverlay(data) {
+            // Update team 1
+            document.getElementById('team1-name').textContent = data.team1.name;
+            document.getElementById('team1-logo').textContent = data.team1.logo;
+            document.getElementById('team1-country').textContent = data.team1.country;
+            document.getElementById('team1-score').textContent = data.team1.score;
+            document.getElementById('left-panel-title').textContent = data.team1.name;
+
+            // Update team 2
+            document.getElementById('team2-name').textContent = data.team2.name;
+            document.getElementById('team2-logo').textContent = data.team2.logo;
+            document.getElementById('team2-country').textContent = data.team2.country;
+            document.getElementById('team2-score').textContent = data.team2.score;
+            document.getElementById('right-panel-title').textContent = data.team2.name;
+
+            // Update match info
+            document.getElementById('round-info').textContent = data.match.round;
+            document.getElementById('map-name').textContent = data.match.map;
+            document.getElementById('timer').textContent = data.match.timer;
+
+            // Update tournament info
+            document.getElementById('tournament-name').textContent = data.tournament.name;
+            document.getElementById('tournament-stage').textContent = data.tournament.stage;
+        }
+
+        // Timer countdown function
+        function startTimer(minutes, seconds) {
+            let totalSeconds = minutes * 60 + seconds;
+            
+            const timerInterval = setInterval(() => {
+                const mins = Math.floor(totalSeconds / 60);
+                const secs = totalSeconds % 60;
+                
+                document.getElementById('timer').textContent = 
+                    `${mins}:${secs.toString().padStart(2, '0')}`;
+                
+                if (totalSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer').textContent = "0:00";
+                }
+                
+                totalSeconds--;
+            }, 1000);
+        }
+
+        // Initialize overlay
+        updateOverlay(overlayData);
+        
+        // Example: Start a 2-minute timer
+        // startTimer(1, 45);
+        
+        // Function to easily update scores (can be called from external sources)
+        window.updateScore = function(team1Score, team2Score) {
+            document.getElementById('team1-score').textContent = team1Score;
+            document.getElementById('team2-score').textContent = team2Score;
+        };
+        
+        // Function to update round info
+        window.updateRound = function(currentRound, maxRounds) {
+            document.getElementById('round-info').textContent = `ROUND ${currentRound}/${maxRounds}`;
+        };
+    </script>
+</body>
+</html>
