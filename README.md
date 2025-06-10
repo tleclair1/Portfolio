@@ -24,7 +24,7 @@ I’m passionate about:
 
 | Project | Description | Tech Stack |
 |--------|-------------|------------|
-| **Gaming Server Latency Checker** | 
+| **Gaming Server Latency Checker** | Web app that monitors gaming server latencyand and visualizes response times with live charts and statistics | HTML, CSS, JavaScript, Chart.js |
 | **GameStat Tracker** | Web app that displays live esports stats | React, Node.js, MongoDB, API Integration |
 
 
