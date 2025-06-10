@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoL Tournament Overlay</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: transparent;
+            color: #fff;
+            overflow: hidden;
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(0,50,100,0.95) 0%, rgba(0,30,60,0.95) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(200,170,110,0.8);
+            border-radius: 12px;
+            padding: 15px 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            animation: slideDown 1s ease-out;
+        }
+        
+        .tournament-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: #C8AA6E;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+        
+        .game-timer {
+            margin-left: 40px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            background: rgba(0,0,0,0.4);
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid rgba(200,170,110,0.3);
+        }
+        
+        /* Team Sections */
+        .team-section {
+            position: absolute;
+            top: 100px;
+            width: 400px;
+            background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(30,30,30,0.8) 100%);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            animation: slideIn 1s ease-out;
+        }
+        
+        .team-blue {
+            left: 50px;
+            border: 3px solid #0596aa;
+            box-shadow: 0 0 20px rgba(5,150,170,0.4);
+        }
+        
+        .team-red {
+            right: 50px;
+            border: 3px solid #d32f2f;
+            box-shadow: 0 0 20px rgba(211,47,47,0.4);
+        }
+        
+        .team-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .team-name {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .team-blue .team-name {
+            color: #00bcd4;
+            text-shadow: 0 0 10px rgba(0,188,212,0.5);
+        }
+        
+        .team-red .team-name {
+            color: #f44336;
+            text-shadow: 0 0 10px rgba(244,67,54,0.5);
+        }
+        
+        .team-score {
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(45deg, #C8AA6E, #F0E6D2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .players-list {
+            list-style: none;
+        }
+        
+        .player {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .team-blue .player {
+            border-left-color: #0596aa;
+        }
+        
+        .team-red .player {
+            border-left-color: #d32f2f;
+        }
+        
+        .player-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        .player-role {
+            font-size: 12px;
+            color: #C8AA6E;
+            font-weight: 400;
+            text-transform: uppercase;
+        }
+        
+        .player-kda {
+            font-size: 12px;
+            color: #aaa;
+            font-weight: 400;
+        }
+        
+        /* Bottom Info Bar */
+        .bottom-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30,30,30,0.9) 100%);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(200,170,110,0.6);
+            border-radius: 12px;
+            padding: 15px 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            animation: slideUp 1s ease-out;
+        }
+        
+        .match-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .match-format {
+            font-size: 14px;
+            color: #C8AA6E;
+            font-weight: 600;
+        }
+        
+        .round-info {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive adjustments for different OBS canvas sizes */
+        @media (max-width: 1680px) {
+            .team-section {
+                width: 350px;
+            }
+            .team-blue {
+                left: 30px;
+            }
+            .team-red {
+                right: 30px;
+            }
+        }
+        
+        /* Glow effects */
+        .team-blue {
+            animation: blueGlow 3s ease-in-out infinite alternate;
+        }
+        
+        .team-red {
+            animation: redGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes blueGlow {
+            0% { box-shadow: 0 0 20px rgba(5,150,170,0.4); }
+            100% { box-shadow: 0 0 30px rgba(5,150,170,0.6); }
+        }
+        
+        @keyframes redGlow {
+            0% { box-shadow: 0 0 20px rgba(211,47,47,0.4); }
+            100% { box-shadow: 0 0 30px rgba(211,47,47,0.6); }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="tournament-title">WORLDS 2025</div>
+            <div class="game-timer" id="gameTimer">00:00</div>
+        </div>
+        
+        <!-- Blue Team (Left) -->
+        <div class="team-section team-blue">
+            <div class="team-header">
+                <div class="team-name" id="blueTeamName">TEAM BLUE</div>
+                <div class="team-score" id="blueScore">0</div>
+            </div>
+            <ul class="players-list">
+                <li class="player">
+                    <div>
+                        <div class="player-name">Player1</div>
+                        <div class="player-role">TOP</div>
+                    </div>
+                    <div class="player-kda">0/0/0</div>
+                </li>
+                <li class="player">
+                    <div>
+                        <div class="player-name">Player2</div>
+                        <div class="player-role">JUNGLE</div>
+                    </div>
+                    <div class="player-kda">0/0/0</div>
+                </li>
+                <li class="player">
+                    <div>
+                        <div class="player-name">Player3</div>
+                        <div class="player-role">MID</div>
+                    </div>
+                    <div class="player-kda">0/0/0</div>
+                </li>
+                <li class="player">
+                    <div>
+                        <div class="player-name">Player4</div>
+                        <div class="player-role">ADC</div>
+                    </div>
+                    <div class="player-kda">0/0/0</div>
+                </li>
+                <li class="player">
+                    <div>
+                        <div class="player-name">Player5</div>
+                        <div class="player-role">SUPPORT</div>
+                    </div>
+                    <div class="player-kda">0/0/0</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Red Team (Right) -->
+        <div class="team-section team-red">
+            <div class="team-header">
+                <div class="team-name" id="redTeamName">TEAM RED</div>
+                <div class="team-score" id="redScore">0</div>
+            </div>
+            <ul class="players-list">
+                <li class="player">
+                    <div>
+                        <div class="player-name">Player1</div>
+                        <div class="player-role">TOP</div>
+                    </div>
+                    <div class="player-kda">0/0/0</div>
+                </li>
+                <li class="player">
+                    <div>
+                        <div class="player-name">Player2</div>
+                        <div class="player-role">JUNGLE</div>
+                    </div>
+                    <div class="player-kda">0/0/0</div>
+                </li>
+                <li class="player">
+                    <div>
+                        <div class="player-name">Player3</div>
+                        <div class="player-role">MID</div>
+                    </div>
+                    <div class="player-kda">0/0/0</div>
+                </li>
+                <li class="player">
+                    <div>
+                        <div class="player-name">Player4</div>
+                        <div class="player-role">ADC</div>
+                    </div>
+                    <div class="player-kda">0/0/0</div>
+                </li>
+                <li class="player">
+                    <div>
+                        <div class="player-name">Player5</div>
+                        <div class="player-role">SUPPORT</div>
+                    </div>
+                    <div class="player-kda">0/0/0</div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Bottom Info Bar -->
+        <div class="bottom-bar">
+            <div class="match-info">
+                <div class="match-format">BEST OF 5</div>
+                <div class="round-info">GRAND FINALS</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Game timer functionality
+        let gameTime = 0;
+        let timerInterval;
+        
+        function updateTimer() {
+            const minutes = Math.floor(gameTime / 60);
+            const seconds = gameTime % 60;
+            document.getElementById('gameTimer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            gameTime++;
+        }
+        
+        function startTimer() {
+            if (!timerInterval) {
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+        }
+        
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+        
+        function resetTimer() {
+            stopTimer();
+            gameTime = 0;
+            updateTimer();
+        }
+        
+        // Score management
+        function updateScore(team, score) {
+            document.getElementById(team + 'Score').textContent = score;
+        }
+        
+        function updateTeamName(team, name) {
+            document.getElementById(team + 'TeamName').textContent = name;
+        }
+        
+        // Example of how to update the overlay (you can call these from browser console)
+        // updateTeamName('blue', 'T1');
+        // updateTeamName('red', 'GEN.G');
+        // updateScore('blue', 2);
+        // updateScore('red', 1);
+        // startTimer();
+        
+        // Auto-start timer for demo
+        setTimeout(startTimer, 2000);
+        
+        // Example team names
+        setTimeout(() => {
+            updateTeamName('blue', 'T1');
+            updateTeamName('red', 'GEN.G');
+        }, 1000);
+    </script>
+</body>
+</html>
