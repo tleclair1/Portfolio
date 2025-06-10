@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Server Latency Checker</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="styles.css" type="text/css">
+</head>
+
+<body>
+    <header>
+        <h1>🎮 Gaming Server Latency Checker</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="controls">
+                <div class="control-row">
+                    <div class="input-group">
+                        <label>Server Address</label>
+                        <input type="text" id="serverInput" placeholder="e.g., riotgames.com or 8.8.8.8" value="">
+                    </div>
+                    <div class="input-group">
+                        <label>Server Name</label>
+                        <input type="text" id="nameInput" placeholder="e.g., Riot Games" value="">
+                    </div>
+                    <div class="input-group">
+                        <label>Popular Servers</label>
+                        <select id="presetSelect" onchange="fillPreset()">
+                            <option value="">-- Select a server --</option>
+                            <optgroup label="🎮 Gaming Platforms">
+                                <option value="riotgames.com|Riot Games (LoL/Valorant)">Riot Games (LoL/Valorant)
+                                </option>
+                                <option value="blizzard.com|Blizzard (WoW/Overwatch)">Blizzard (WoW/Overwatch)</option>
+                                <option value="steampowered.com|Steam">Steam</option>
+                                <option value="epicgames.com|Epic Games (Fortnite)">Epic Games (Fortnite)</option>
+                                <option value="ea.com|Electronic Arts">Electronic Arts</option>
+                                <option value="ubisoft.com|Ubisoft">Ubisoft</option>
+                                <option value="minecraft.net|Minecraft">Minecraft</option>
+                                <option value="activision.com|Call of Duty">Call of Duty</option>
+                                <option value="rockstargames.com|Rockstar Games">Rockstar Games</option>
+                            </optgroup>
+                            <optgroup label="🎲 Battle Royale">
+                                <option value="pubg.com|PUBG">PUBG</option>
+                                <option value="apexlegends.com|Apex Legends">Apex Legends</option>
+                                <option value="fallguys.com|Fall Guys">Fall Guys</option>
+                            </optgroup>
+                            <optgroup label="☁️ Cloud Gaming">
+                                <option value="nvidia.com|GeForce NOW">GeForce NOW</option>
+                                <option value="xbox.com|Xbox Live">Xbox Live</option>
+                                <option value="playstation.com|PlayStation Network">PlayStation Network</option>
+                                <option value="luna.amazon.com|Amazon Luna">Amazon Luna</option>
+                            </optgroup>
+                            <optgroup label="🗣️ Communication">
+                                <option value="discord.com|Discord">Discord</option>
+                                <option value="teamspeak.com|TeamSpeak">TeamSpeak</option>
+                                <option value="twitch.tv|Twitch">Twitch</option>
+                                <option value="youtube.com|YouTube Gaming">YouTube Gaming</option>
+                            </optgroup>
+                            <optgroup label="🌐 DNS & CDN">
+                                <option value="8.8.8.8|Google DNS">Google DNS (8.8.8.8)</option>
+                                <option value="1.1.1.1|Cloudflare DNS">Cloudflare DNS (1.1.1.1)</option>
+                                <option value="208.67.222.222|OpenDNS">OpenDNS</option>
+                                <option value="google.com|Google">Google</option>
+                                <option value="cloudflare.com|Cloudflare">Cloudflare</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <button onclick="addServer()">Add Server</button>
+                </div>
+
+                <div class="control-row">
+                    <div class="input-group">
+                        <label>Ping Interval (ms)</label>
+                        <select id="intervalSelect">
+                            <option value="1000">1 second</option>
+                            <option value="2000" selected>2 seconds</option>
+                            <option value="5000">5 seconds</option>
+                            <option value="10000">10 seconds</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Alert Threshold</label>
+                        <input type="number" id="alertThreshold" placeholder="ms" value="100" style="width: 80px;">
+                    </div>
+                    <button onclick="togglePinging()" id="pingBtn">Start Pinging</button>
+                    <button onclick="clearChart()">Clear Chart</button>
+                    <button onclick="exportData()" id="exportBtn">📊 Export</button>
+                </div>
+            </div>
+
+            <div class="server-list" id="serverList">
+                <!-- Server cards will be added here -->
+            </div>
+
+            <div class="chart-container">
+                <canvas id="latencyChart"></canvas>
+            </div>
+
+            <div class="stats" id="stats">
+                <!-- Stats will be populated here -->
+            </div>
+        </div>
+    </main>
+    <footer>
+
+    </footer>
+</body>
+
+</html>
