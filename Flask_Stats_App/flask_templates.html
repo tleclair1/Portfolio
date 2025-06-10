@@ -1,0 +1,284 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Esports Stats{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+            color: #ff6b35 !important;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+        .match-card {
+            transition: transform 0.2s;
+        }
+        .match-card:hover {
+            transform: translateY(-2px);
+        }
+        .winner {
+            font-weight: bold;
+            color: #28a745;
+        }
+        .loser {
+            color: #6c757d;
+        }
+        .game-badge {
+            font-size: 0.8rem;
+        }
+        footer {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-gamepad"></i> Esports Stats</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/matches"><i class="fas fa-list"></i> All Matches</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/teams"><i class="fas fa-users"></i> Teams</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="text-center text-muted">
+        <div class="container">
+            <p>&copy; 2025 Esports Stats. Data updates every few minutes.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block title %}Home - Esports Stats{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-trophy"></i> Esports Dashboard</h1>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Matches -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-clock"></i> Recent Matches</h5>
+            </div>
+            <div class="card-body">
+                {% for match in matches %}
+                <div class="card match-card mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                <span class="badge bg-primary game-badge">{{ match.game }}</span>
+                                <small class="d-block text-muted">{{ match.date }}</small>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="{% if match.winner == match.team1 %}winner{% else %}loser{% endif %}">
+                                        {{ match.team1 }}
+                                    </span>
+                                    <span class="mx-3">
+                                        <strong>{{ match.score1 }} - {{ match.score2 }}</strong>
+                                    </span>
+                                    <span class="{% if match.winner == match.team2 %}winner{% else %}loser{% endif %}">
+                                        {{ match.team2 }}
+                                    </span>
+                                </div>
+                                <small class="text-muted">{{ match.tournament }}</small>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <small class="text-muted">
+                                    <i class="fas fa-stopwatch"></i> {{ match.duration }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="text-center">
+                    <a href="/matches" class="btn btn-outline-primary">
+                        <i class="fas fa-list"></i> View All Matches
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Teams -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-medal"></i> Top Teams</h5>
+            </div>
+            <div class="card-body">
+                {% for team in (team_stats.values() | list | sort(attribute='win_rate', reverse=true))[:5] %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <strong>{{ team.name }}</strong>
+                        <small class="d-block text-muted">{{ team.matches_played }} matches</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success">{{ team.win_rate }}%</span>
+                        <small class="d-block text-muted">{{ team.wins }}W-{{ team.losses }}L</small>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="text-center mt-3">
+                    <a href="/teams" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-users"></i> View All Teams
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h3>{{ matches|length }}</h3>
+                        <small class="text-muted">Recent Matches</small>
+                    </div>
+                    <div class="col-6">
+                        <h3>{{ team_stats|length }}</h3>
+                        <small class="text-muted">Active Teams</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- templates/matches.html -->
+{% extends "base.html" %}
+
+{% block title %}All Matches - Esports Stats{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-list"></i> All Matches</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Game</th>
+                                <th>Match</th>
+                                <th>Score</th>
+                                <th>Duration</th>
+                                <th>Tournament</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for match in matches %}
+                            <tr>
+                                <td>{{ match.date }}</td>
+                                <td><span class="badge bg-primary">{{ match.game }}</span></td>
+                                <td>
+                                    <span class="{% if match.winner == match.team1 %}winner{% else %}loser{% endif %}">
+                                        {{ match.team1 }}
+                                    </span>
+                                    vs
+                                    <span class="{% if match.winner == match.team2 %}winner{% else %}loser{% endif %}">
+                                        {{ match.team2 }}
+                                    </span>
+                                </td>
+                                <td><strong>{{ match.score1 }} - {{ match.score2 }}</strong></td>
+                                <td>{{ match.duration }}</td>
+                                <td><small>{{ match.tournament }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- templates/teams.html -->
+{% extends "base.html" %}
+
+{% block title %}Teams - Esports Stats{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-users"></i> Team Rankings</h1>
+    </div>
+</div>
+
+<div class="row">
+    {% for team in teams %}
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ team.name }}</h5>
+                <div class="row">
+                    <div class="col-6">
+                        <p class="mb-1"><strong>Win Rate:</strong></p>
+                        <h4 class="text-success">{{ team.win_rate }}%</h4>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1"><strong>Record:</strong></p>
+                        <p class="mb-0">{{ team.wins }}W - {{ team.losses }}L</p>
+                        <small class="text-muted">{{ team.matches_played }} total</small>
+                    </div>
+                </div>
+                <hr>
+                <p class="mb-1"><strong>Games:</strong></p>
+                {% for game in team.games %}
+                <span class="badge bg-secondary me-1">{{ game }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
