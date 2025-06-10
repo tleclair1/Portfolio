@@ -25,7 +25,11 @@ I’m passionate about:
 | Project | Description | Tech Stack |
 |--------|-------------|------------|
 | **Gaming Server Latency Checker** | Web app that monitors gaming server latencyand and visualizes response times with live charts and statistics | HTML, CSS, JavaScript, Chart.js |
-| **GameStat Tracker** | Web app that displays live esports stats | React, Node.js, MongoDB, API Integration |
+| **GameStat Tracker (work in progress)** | (work in progress) |  |
+| **Flask Esports Stats** | (work in progress) | |
+| **Input Tracker for FPS** | (work in progress) | |
+| **CS2 Tournament Overlay** | (work in progress) | |
+| **LoL Tournament Overlay** | (work in progress) | |
 
 
 ## Tools & Technologies
